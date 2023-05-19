@@ -37,9 +37,15 @@ const Root = () => {
   return (
     <>
       <NavMenu />
-      <HorizontalBarChart data={bardata} width={500} height={500} />
-      <SingleStack data={singlestackdata} width={500} height={500} />
-      <ButterflyChart data={butterflydata} width={500} height={500} />
+      <HorizontalBarChart data={bardata} width={800} height={800} />
+      <br />
+      <br />
+      <SingleStack data={singlestackdata} width={800} height={800} />
+      <br />
+      <br />
+      <ButterflyChart data={butterflydata} width={800} height={800} />
+      <br />
+      <br />
     </>
   );
 };

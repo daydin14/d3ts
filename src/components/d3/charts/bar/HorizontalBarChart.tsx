@@ -19,7 +19,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     if (!svgRef.current) return;
 
     // Define the dimensions of the chart
-    const margin = { top: 20, right: 20, bottom: 30, left: 100 };
+    const margin = { top: 50, right: 50, bottom: 50, left: 50 };
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
 
@@ -37,14 +37,14 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .attr("width", width)
       .attr("height", height)
       .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+      .attr("transform", `translate(${margin.left + 50},${margin.top})`);
 
     // Define the scales
     const xScale = d3
       .scaleLinear()
       .domain([0, 1])
       .nice()
-      .range([0, chartWidth - 90]); // Try [0,max] ?
+      .range([0, chartWidth]);
     const yScale = d3
       .scaleBand()
       .range([0, chartHeight])
@@ -60,15 +60,50 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     const t = d3.transition().duration(duration).ease(d3.easeLinear);
 
     // Axes
+    svg.append("g").attr("class", "axes");
+
     svg
+      .select(".axes")
       .append("g")
       .attr("class", "x-axis")
       .attr("transform", `translate(0,${chartHeight})`)
-      .call(d3.axisBottom(xScale).tickFormat(d3.format(".2r")));
-    svg.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale));
+      .call(d3.axisBottom(xScale).tickFormat(d3.format(".0%")))
+      .transition(t)
+      .delay((_d, i) => i * (duration / normalizedData.length))
+      .selectAll("text")
+      .attr("transform", "translate(-10,10)rotate(-45)")
+      .style("text-anchor", "end");
+    svg
+      .select(".axes")
+      .append("g")
+      .attr("class", "y-axis")
+      .call(d3.axisLeft(yScale));
+
+    // Axes Titles
+    svg
+      .select(".axes")
+      .append("text")
+      .attr("class", "x-title")
+      .attr("text-anchor", "end")
+      .attr("x", (width - margin.left) / 2)
+      .attr("y", chartHeight + 50)
+      .text("X-Axis Title")
+      .attr("fill", "crimson");
+    svg
+      .select(".axes")
+      .append("text")
+      .attr("class", "y-title")
+      .attr("text-anchor", "end")
+      .attr("transform", "rotate(-90)")
+      .attr("y", -margin.left - 20)
+      .attr("x", -(chartWidth - margin.bottom) / 2)
+      .text("Y Axis Ttile")
+      .attr("fill", "crimson");
 
     // Add the bars to the chart
     svg
+      .append("g")
+      .attr("class", "bars")
       .selectAll(".bar")
       .data(normalizedData)
       .enter()
