@@ -50,10 +50,22 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .range([0, chartHeight])
       .domain(data.map((d) => d.label))
       .padding(0.3);
-    // const colorScale = d3
-    //   .scaleOrdinal()
-    //   .domain(normalizedData.map((d) => d.label))
-    //   .range(d3.schemeTableau10);
+    const colorScale = d3
+      .scaleOrdinal()
+      .domain(normalizedData.map((d) => d.label))
+      .range(d3.schemeTableau10);
+
+    // Animation transition
+    const duration = 500;
+    const t = d3.transition().duration(duration).ease(d3.easeLinear);
+
+    // Axes
+    svg
+      .append("g")
+      .attr("class", "x-axis")
+      .attr("transform", `translate(0,${chartHeight})`)
+      .call(d3.axisBottom(xScale).tickFormat(d3.format(".2r")));
+    svg.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale));
 
     // Add the bars to the chart
     svg
@@ -64,19 +76,11 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .attr("class", "bar")
       .attr("x", 0)
       .attr("y", (d) => yScale(d.label)!)
+      .transition(t)
+      .delay((_d, i) => i * (duration / normalizedData.length))
       .attr("width", (d) => xScale(d.value))
-      .attr("height", yScale.bandwidth());
-    // .attr('style', 'color: white;');
-
-    // Add the x-axis to the chart
-    svg
-      .append("g")
-      .attr("class", "x-axis")
-      .attr("transform", `translate(0,${chartHeight})`)
-      .call(d3.axisBottom(xScale).tickFormat(d3.format(".2r")));
-
-    // Add the y-axis to the chart
-    svg.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale));
+      .attr("height", yScale.bandwidth())
+      .attr("fill", (d) => colorScale(d.label) as string);
 
     return () => {
       // Clean up the chart when the component unmounts
