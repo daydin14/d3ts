@@ -117,6 +117,37 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .attr("height", yScale.bandwidth())
       .attr("fill", (d) => colorScale(d.label) as string);
 
+    // Legend
+    svg.append("g").attr("class", "legend");
+    var size = 30;
+    svg
+      .select(".legend")
+      .append("g")
+      .attr("class", "legend-squares")
+      .selectAll("legend-squares")
+      .data(normalizedData)
+      .enter()
+      .append("rect")
+      .attr("x", chartWidth - margin.right - margin.left)
+      .attr("y", (_d, i) => 10 + i * (size + 5))
+      .attr("width", size)
+      .attr("height", size)
+      .attr("fill", (d) => colorScale(d.label) as string);
+    svg
+      .select(".legend")
+      .append("g")
+      .attr("class", "legend-text")
+      .selectAll("legend-text")
+      .data(normalizedData)
+      .enter()
+      .append("text")
+      .attr("x", chartWidth - margin.right)
+      .attr("y", (_d, i) => 10 + i * (size + 5) + size / 2)
+      .text((d: any) => d.label)
+      .attr("text-anchor", "left")
+      .style("alignment-baseline", "middle")
+      .attr("fill", (d) => colorScale(d.label) as string);
+
     return () => {
       // Clean up the chart when the component unmounts
       svg.selectAll("*").remove();
