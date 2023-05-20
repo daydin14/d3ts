@@ -13,10 +13,11 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   width,
   height,
 }) => {
-  const svgRef = useRef<SVGSVGElement | null>(null);
+  const chartRef = useRef<SVGSVGElement | null>(null);
+  const legendRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
-    if (!svgRef.current) return;
+    if (!chartRef.current) return;
 
     // Define the dimensions of the chart
     const margin = { top: 50, right: 50, bottom: 50, left: 50 };
@@ -33,7 +34,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
 
     // Reference the chart SVG Element
     const svg = d3
-      .select(svgRef.current)
+      .select(chartRef.current)
       .attr("width", width)
       .attr("height", height)
       .append("g")
@@ -118,9 +119,10 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .attr("fill", (d) => colorScale(d.label) as string);
 
     // Legend
-    svg.append("g").attr("class", "legend");
-    var size = 30;
-    svg
+    const barLegend = d3.select(legendRef.current);
+    barLegend.append("g").attr("class", "legend");
+    var size = 20;
+    barLegend
       .select(".legend")
       .append("g")
       .attr("class", "legend-squares")
@@ -128,12 +130,12 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .data(normalizedData)
       .enter()
       .append("rect")
-      .attr("x", chartWidth - margin.right - margin.left)
+      .attr("x", 75)
       .attr("y", (_d, i) => 10 + i * (size + 5))
       .attr("width", size)
       .attr("height", size)
       .attr("fill", (d) => colorScale(d.label) as string);
-    svg
+    barLegend
       .select(".legend")
       .append("g")
       .attr("class", "legend-text")
@@ -141,7 +143,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .data(normalizedData)
       .enter()
       .append("text")
-      .attr("x", chartWidth - margin.right)
+      .attr("x", 100)
       .attr("y", (_d, i) => 10 + i * (size + 5) + size / 2)
       .text((d: any) => d.label)
       .attr("text-anchor", "left")
@@ -154,7 +156,12 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     };
   }, [data, width, height]);
 
-  return <svg ref={svgRef} />;
+  return (
+    <>
+      <svg ref={chartRef} />
+      <svg ref={legendRef} width={200} height={500} />
+    </>
+  );
 };
 
 export default HorizontalBarChart;
