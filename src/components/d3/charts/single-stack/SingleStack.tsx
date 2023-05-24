@@ -12,30 +12,43 @@ interface SingleStackProps {
 }
 
 const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
-  const svgRef = useRef<SVGSVGElement | null>(null);
+  const chartRef = useRef<SVGSVGElement | null>(null);
+  const legendRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
-    if (!svgRef.current) return;
+    if (!chartRef.current) return;
 
-    const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+    // Define the dimensions of the chart
+    const margin = { top: 20, right: 20, bottom: 20, left: 20 };
+    const chartWidth = width - (margin.left + margin.right);
+    const chartHeight = height - margin.top - margin.bottom;
 
+    const sum = d3.sum(data, (d) => d.value);
+    const max = d3.max(data, (d) => d.value)!;
+    const min = d3.min(data, (d) => d.value)!;
+    const normalizedData = data.map((d) => ({
+      ...d,
+      value: max <= min ? (d.value - min) / 1 : (d.value - min) / (max - min),
+    }));
+
+    // Reference the chart SVG element
     const svg = d3
-      .select(svgRef.current)
-      .attr("width", width)
-      .attr("height", height)
-      .append("g");
-    // .attr('transform', `translate(${margin.left},${margin.top})`);
+      .select(chartRef.current)
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
 
     // Scales
     const xScale = d3
       .scaleLinear()
-      .domain([0, 100])
+      .domain([0, 1])
       .nice()
-      .range([0, width - margin.left - margin.right]);
+      .range([0, chartWidth]);
 
     const yScale = d3
       .scaleBand()
-      .range([0, height - margin.top - margin.bottom])
+      .range([0, chartHeight - 50])
       .padding(0.1);
 
     const colorScale = d3
@@ -44,91 +57,88 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .range(d3.schemeTableau10);
 
     // Axes
-    const xAxis = d3.axisBottom(xScale).ticks(10, "~s");
+    const xAxis = d3.axisBottom(xScale).ticks(10, `${d3.format(".0%")}`);
     const yAxis = d3.axisLeft(yScale);
 
     svg
       .append("g")
-      .attr("transform", `translate(5, ${height - margin.top - margin.bottom})`) //${(height - margin.top - margin.bottom)/4}
+      .attr("class", "x-axis")
+      .attr("transform", `translate(5, ${height - margin.top})`)
       .call(xAxis)
       .call((g) => g.select(".domain").remove());
 
     svg
       .append("g")
+      .attr("class", "y-axis")
       .call(yAxis)
       .call((g) => g.select(".domain").remove());
 
-    var circleGrid = svg.append<SVGGElement>("g");
-    var count = 10;
-    // create one group for each insurance
-    const layers = svg
-      .append("g")
-      .attr("class", "stacked-bar-legend")
-      .selectAll("g")
-      .data(data)
-      .join("g")
-      .attr("fill", (d: any) => {
-        var circle = circleGrid.append("circle");
-        var textTitle = circleGrid.append("text").text(d.category);
-        //var text_elements = circleGrid.selectAll("text");
-        //var textElement = text_elements.filter((_, i) => i === text_elements.size() - 1);
-        //var textWidth = (textElement.node() as SVGTextElement).getComputedTextLength();
-
-        circle
-          .attr("class", "stacked-bar-circle-legend")
-          .attr("cx", count)
-          .attr("cy", "0")
-          .attr("r", "10")
-          .attr(`transform`, `translate(${width / height}, 25)`)
-          .attr("fill", colorScale(d.category) as string);
-        count = count + 50;
-
-        textTitle
-          .attr("class", "stacked-bar-legend-labels")
-          .attr("x", count)
-          .attr("transform", `translate(${width / height}, 10)`)
-          .attr("y", 50)
-          .attr("font-size", "24px")
-          .attr("fill", "black");
-        //count = count + textWidth;
-        return colorScale(d.category) as string;
-      });
-
-    // Sliding animation transition for bars
+    // Animation transition
     const duration = 100;
     const t = d3.transition().duration(duration).ease(d3.easeLinear);
 
-    // draw bars
-    layers.each(function (_, i: number) {
-      console.log(i);
-      // this refers to the group for a given insurance
-      d3.select(this)
-        .selectAll("rect")
-        .data(data)
-        .join("rect")
-        .attr("x", (_) => i * (width / data.length))
-        .attr(`transform`, `translate(${width / height}, 200)`) // Moves bar
-        .attr("height", 100) // Adjust height of the rectangles in the bar
-        .transition(t)
-        .delay(i * duration)
-        .attr("width", width / data.length);
-      //console.log(data)
-      // .attr('width', (width/data.length));
+    let x: number[] = [0];
+    let w: number[] = [(data[0].value / sum) * chartWidth];
+
+    data.forEach((d, i) => {
+      if (i != 0) {
+        w[i] = (d.value / sum) * chartWidth;
+        x[i] = x[i - 1] + w[i - 1];
+      }
     });
 
-    // layers.each(function (d: any) {
-    //     d3.select(this)
-    //         .selectAll('text')
-    //         .data(d)
-    //         .join('text')
-    //         .text((d: any) => { return `${(d[1] as number) - (d[0] as number)}%`;})
-    //         .attr("x", (d: any) => xScale(d[0]))
-    //         .attr("y", "30px")
-    //         .attr("class", "stack-font-size")
-    //         .style("fill", 'black');
-    // });
+    // Draw Bars
+    svg
+      .append("g")
+      .attr("class", "bars")
+      .selectAll("g")
+      .data(data)
+      .join("rect")
+      .attr("x", (_, i) => x[i])
+      .attr("transform", `translate(0, ${height / 2})`)
+      .attr("height", height / 5)
+      .transition(t)
+      .delay((_d, i) => i * (duration / normalizedData.length))
+      .attr("width", (_, i) => w[i])
+      .attr("fill", (d: any) => colorScale(d.category) as string);
+
+    // Legend
+    var size = 10;
+    const legend = d3.select(legendRef.current);
+
+    legend
+      .append("g")
+      .attr("class", "legend-squares")
+      .selectAll("legend-squares")
+      .data(normalizedData)
+      .enter()
+      .append("rect")
+      .attr("x", 75)
+      .attr("y", (_d, i) => 50 + i * (size + 5))
+      .attr("width", size)
+      .attr("height", size)
+      .style("fill", (d: any) => colorScale(d.category) as string);
+
+    legend
+      .append("g")
+      .attr("class", "legend-text")
+      .selectAll("legend-text")
+      .data(normalizedData)
+      .enter()
+      .append("text")
+      .attr("x", 100)
+      .attr("y", (_d, i) => 50 + i * (size + 5) + size / 2)
+      .style("fill", (d: any) => colorScale(d.category) as string)
+      .text((d: any) => d.category)
+      .attr("text-anchor", "left")
+      .style("alignment-baseline", "middle");
   }, [data, width, height]);
-  return <svg ref={svgRef} />;
+  return (
+    <>
+      <svg ref={chartRef} />
+      <svg ref={legendRef} width={200} height={500} />
+    </>
+  );
 };
 
 export default SingleStack;
