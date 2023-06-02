@@ -37,7 +37,13 @@ const Root = () => {
   return (
     <>
       <NavMenu />
-      <HorizontalBarChart data={bardata} width={800} height={800} />
+      <HorizontalBarChart
+        data={bardata}
+        width={800}
+        height={800}
+        xtitle="Skill Level"
+        ytitle="Coding"
+      />
       <br />
       <br />
       <SingleStack data={singlestackdata} width={800} height={800} />

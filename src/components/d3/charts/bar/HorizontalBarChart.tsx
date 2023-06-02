@@ -6,12 +6,16 @@ interface HorizontalBarChartProps {
   data: { label: string; value: number }[];
   width: number;
   height: number;
+  xtitle: string;
+  ytitle: string;
 }
 
 const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
   data,
   width,
   height,
+  xtitle,
+  ytitle,
 }) => {
   const chartRef = useRef<SVGSVGElement | null>(null);
   const legendRef = useRef<SVGSVGElement | null>(null);
@@ -88,7 +92,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .attr("text-anchor", "end")
       .attr("x", (width - margin.left) / 2)
       .attr("y", chartHeight + 50)
-      .text("X-Axis Title")
+      .text(xtitle)
       .attr("fill", "crimson");
     svg
       .select(".axes")
@@ -98,7 +102,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .attr("transform", "rotate(-90)")
       .attr("y", -margin.left - 20)
       .attr("x", -(chartWidth - margin.bottom) / 2)
-      .text("Y Axis Ttile")
+      .text(ytitle)
       .attr("fill", "crimson");
 
     // Add the bars to the chart
