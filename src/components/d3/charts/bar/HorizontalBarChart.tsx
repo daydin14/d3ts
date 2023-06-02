@@ -31,9 +31,10 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     // Normalize Data
     const max = d3.max(data, (d) => d.value)!;
     const min = d3.min(data, (d) => d.value)!;
-    const normalizedData = data.map((d) => ({
+    const normalizedData = data.map((d, i) => ({
       ...d,
       value: (d.value - min) / (max - min),
+      index: i,
     }));
 
     // Reference the chart SVG Element
@@ -113,7 +114,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .data(normalizedData)
       .enter()
       .append("rect")
-      .attr("class", "bar")
+      .attr("class", (d: any) => `bar rect-${d.index}`)
       .attr("x", 0)
       .attr("y", (d) => yScale(d.label)!)
       .transition(t)
@@ -123,6 +124,17 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .attr("fill", (d) => colorScale(d.label) as string);
 
     // Legend
+    const highlight = (_event: any, d: any) => {
+      d3.select(chartRef.current).selectAll(".bar").style("opacity", 0.1);
+      d3.select(chartRef.current)
+        .select(`.rect-${d.index}`)
+        .style("opacity", 1);
+    };
+
+    const noHightlight = () => {
+      d3.selectAll(".bar").style("opacity", 1);
+    };
+
     const barLegend = d3.select(legendRef.current);
     barLegend.append("g").attr("class", "legend");
     var size = 20;
@@ -138,7 +150,9 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .attr("y", (_d, i) => 10 + i * (size + 5))
       .attr("width", size)
       .attr("height", size)
-      .attr("fill", (d) => colorScale(d.label) as string);
+      .attr("fill", (d) => colorScale(d.label) as string)
+      .on("mouseover", highlight)
+      .on("mouseleave", noHightlight);
     barLegend
       .select(".legend")
       .append("g")
@@ -152,7 +166,9 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .text((d: any) => d.label)
       .attr("text-anchor", "left")
       .style("alignment-baseline", "middle")
-      .attr("fill", (d) => colorScale(d.label) as string);
+      .attr("fill", (d) => colorScale(d.label) as string)
+      .on("mouseover", highlight)
+      .on("mouseleave", noHightlight);
 
     return () => {
       // Clean up the chart when the component unmounts
