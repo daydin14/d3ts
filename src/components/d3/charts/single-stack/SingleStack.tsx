@@ -61,14 +61,15 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .append("g")
       .attr("class", "x-axis")
       .attr("transform", `translate(5, ${height - margin.top})`)
-      .call(xAxis)
-      .call((g) => g.select(".domain").remove());
+      .call(xAxis);
+    //.call((g) => g.select(".domain").remove());     // This removes the line connecting the ticks on the x-axis
 
     svg
       .append("g")
       .attr("class", "y-axis")
       .call(yAxis)
-      .call((g) => g.select(".domain").remove());
+      .attr("transform", `translate(5, ${margin.top + margin.bottom + 30})`);
+    //.call((g) => g.select(".domain").remove());
 
     // Animation transition
     const duration = 100;
