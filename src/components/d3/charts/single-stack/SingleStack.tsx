@@ -1,6 +1,3 @@
-// Styling
-// import "../d3styles.css";
-
 // Dependencies
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
