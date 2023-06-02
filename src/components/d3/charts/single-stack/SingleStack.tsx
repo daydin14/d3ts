@@ -54,6 +54,10 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .domain(data.map((d) => d.category))
       .range(d3.schemeTableau10);
 
+    // Animation transition
+    const duration = 500;
+    const t = d3.transition().duration(duration).ease(d3.easeLinear);
+
     // Axes
     const xAxis = d3.axisBottom(xScale).ticks(10, `${d3.format(".0%")}`);
     const yAxis = d3.axisLeft(yScale);
@@ -71,10 +75,6 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .attr("transform", `translate(5, ${margin.top + margin.bottom + 30})`)
       .call(yAxis);
     //.call((g) => g.select(".domain").remove());     // This removes the y-axis line
-
-    // Animation transition
-    const duration = 500;
-    const t = d3.transition().duration(duration).ease(d3.easeLinear);
 
     // Dynamic sizing of each bar in single-stack
     let x: number[] = [0];
@@ -115,8 +115,9 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
     };
     var size = 10;
     const legend = d3.select(legendRef.current);
-
+    legend.append("g").attr("class", "legend");
     legend
+      .select(".legend")
       .append("g")
       .attr("class", "legend-squares")
       .selectAll("legend-squares")
@@ -132,6 +133,7 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .on("mouseleave", noHightlight);
 
     legend
+      .select(".legend")
       .append("g")
       .attr("class", "legend-text")
       .selectAll("legend-text")
