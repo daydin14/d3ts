@@ -23,9 +23,10 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
     const sum = d3.sum(data, (d) => d.value);
     const max = d3.max(data, (d) => d.value)!;
     const min = d3.min(data, (d) => d.value)!;
-    const normalizedData = data.map((d) => ({
+    const normalizedData = data.map((d, i) => ({
       ...d,
       value: max <= min ? (d.value - min) / 1 : (d.value - min) / (max - min),
+      index: i,
     }));
 
     // Reference the chart SVG element
@@ -91,8 +92,9 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .append("g")
       .attr("class", "bars")
       .selectAll("g")
-      .data(data)
+      .data(normalizedData)
       .join("rect")
+      .attr("class", (d: any) => `bar rect-${d.index}`)
       .attr("x", (_, i) => x[i])
       .attr("transform", `translate(5, ${height / 2})`)
       .attr("height", height / 5)
@@ -102,6 +104,15 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .attr("fill", (d: any) => colorScale(d.category) as string);
 
     // Legend
+    const highlight = (_event: any, d: any) => {
+      d3.select(chartRef.current).selectAll(".bar").style("opacity", 0.1);
+      d3.select(chartRef.current)
+        .select(`.rect-${d.index}`)
+        .style("opacity", 1);
+    };
+    const noHightlight = () => {
+      d3.selectAll(".bar").style("opacity", 1);
+    };
     var size = 10;
     const legend = d3.select(legendRef.current);
 
@@ -116,7 +127,9 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .attr("y", (_d, i) => 50 + i * (size + 5))
       .attr("width", size)
       .attr("height", size)
-      .style("fill", (d: any) => colorScale(d.category) as string);
+      .style("fill", (d: any) => colorScale(d.category) as string)
+      .on("mouseover", highlight)
+      .on("mouseleave", noHightlight);
 
     legend
       .append("g")
@@ -130,7 +143,9 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .style("fill", (d: any) => colorScale(d.category) as string)
       .text((d: any) => d.category)
       .attr("text-anchor", "left")
-      .style("alignment-baseline", "middle");
+      .style("alignment-baseline", "middle")
+      .on("mouseover", highlight)
+      .on("mouseleave", noHightlight);
   }, [data, width, height]);
   return (
     <>
