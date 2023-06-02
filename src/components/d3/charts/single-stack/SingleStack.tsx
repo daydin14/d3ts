@@ -62,19 +62,20 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .attr("class", "x-axis")
       .attr("transform", `translate(5, ${height - margin.top})`)
       .call(xAxis);
-    //.call((g) => g.select(".domain").remove());     // This removes the line connecting the ticks on the x-axis
+    //.call((g) => g.select(".domain").remove());     // This removes the x-axis line
 
     svg
       .append("g")
       .attr("class", "y-axis")
-      .call(yAxis)
-      .attr("transform", `translate(5, ${margin.top + margin.bottom + 30})`);
-    //.call((g) => g.select(".domain").remove());
+      .attr("transform", `translate(5, ${margin.top + margin.bottom + 30})`)
+      .call(yAxis);
+    //.call((g) => g.select(".domain").remove());     // This removes the y-axis line
 
     // Animation transition
-    const duration = 100;
+    const duration = 500;
     const t = d3.transition().duration(duration).ease(d3.easeLinear);
 
+    // Dynamic sizing of each bar in single-stack
     let x: number[] = [0];
     let w: number[] = [(data[0].value / sum) * chartWidth];
 
@@ -93,7 +94,7 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .data(data)
       .join("rect")
       .attr("x", (_, i) => x[i])
-      .attr("transform", `translate(0, ${height / 2})`)
+      .attr("transform", `translate(5, ${height / 2})`)
       .attr("height", height / 5)
       .transition(t)
       .delay((_d, i) => i * (duration / normalizedData.length))
