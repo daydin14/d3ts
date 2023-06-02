@@ -1,6 +1,3 @@
-// Styling
-// import "../d3styles.css";
-
 // Dependencies
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
@@ -26,9 +23,10 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
     const sum = d3.sum(data, (d) => d.value);
     const max = d3.max(data, (d) => d.value)!;
     const min = d3.min(data, (d) => d.value)!;
-    const normalizedData = data.map((d) => ({
+    const normalizedData = data.map((d, i) => ({
       ...d,
       value: max <= min ? (d.value - min) / 1 : (d.value - min) / (max - min),
+      index: i,
     }));
 
     // Reference the chart SVG element
@@ -56,6 +54,10 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .domain(data.map((d) => d.category))
       .range(d3.schemeTableau10);
 
+    // Animation transition
+    const duration = 500;
+    const t = d3.transition().duration(duration).ease(d3.easeLinear);
+
     // Axes
     const xAxis = d3.axisBottom(xScale).ticks(10, `${d3.format(".0%")}`);
     const yAxis = d3.axisLeft(yScale);
@@ -64,19 +66,17 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .append("g")
       .attr("class", "x-axis")
       .attr("transform", `translate(5, ${height - margin.top})`)
-      .call(xAxis)
-      .call((g) => g.select(".domain").remove());
+      .call(xAxis);
+    //.call((g) => g.select(".domain").remove());     // This removes the x-axis line
 
     svg
       .append("g")
       .attr("class", "y-axis")
-      .call(yAxis)
-      .call((g) => g.select(".domain").remove());
+      .attr("transform", `translate(5, ${margin.top + margin.bottom + 30})`)
+      .call(yAxis);
+    //.call((g) => g.select(".domain").remove());     // This removes the y-axis line
 
-    // Animation transition
-    const duration = 100;
-    const t = d3.transition().duration(duration).ease(d3.easeLinear);
-
+    // Dynamic sizing of each bar in single-stack
     let x: number[] = [0];
     let w: number[] = [(data[0].value / sum) * chartWidth];
 
@@ -92,10 +92,11 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .append("g")
       .attr("class", "bars")
       .selectAll("g")
-      .data(data)
+      .data(normalizedData)
       .join("rect")
+      .attr("class", (d: any) => `bar rect-${d.index}`)
       .attr("x", (_, i) => x[i])
-      .attr("transform", `translate(0, ${height / 2})`)
+      .attr("transform", `translate(5, ${height / 2})`)
       .attr("height", height / 5)
       .transition(t)
       .delay((_d, i) => i * (duration / normalizedData.length))
@@ -103,10 +104,20 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .attr("fill", (d: any) => colorScale(d.category) as string);
 
     // Legend
+    const highlight = (_event: any, d: any) => {
+      d3.select(chartRef.current).selectAll(".bar").style("opacity", 0.1);
+      d3.select(chartRef.current)
+        .select(`.rect-${d.index}`)
+        .style("opacity", 1);
+    };
+    const noHightlight = () => {
+      d3.selectAll(".bar").style("opacity", 1);
+    };
     var size = 10;
     const legend = d3.select(legendRef.current);
-
+    legend.append("g").attr("class", "legend");
     legend
+      .select(".legend")
       .append("g")
       .attr("class", "legend-squares")
       .selectAll("legend-squares")
@@ -117,9 +128,12 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .attr("y", (_d, i) => 50 + i * (size + 5))
       .attr("width", size)
       .attr("height", size)
-      .style("fill", (d: any) => colorScale(d.category) as string);
+      .style("fill", (d: any) => colorScale(d.category) as string)
+      .on("mouseover", highlight)
+      .on("mouseleave", noHightlight);
 
     legend
+      .select(".legend")
       .append("g")
       .attr("class", "legend-text")
       .selectAll("legend-text")
@@ -131,7 +145,9 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .style("fill", (d: any) => colorScale(d.category) as string)
       .text((d: any) => d.category)
       .attr("text-anchor", "left")
-      .style("alignment-baseline", "middle");
+      .style("alignment-baseline", "middle")
+      .on("mouseover", highlight)
+      .on("mouseleave", noHightlight);
   }, [data, width, height]);
   return (
     <>
