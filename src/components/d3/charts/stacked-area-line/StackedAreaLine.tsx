@@ -96,6 +96,52 @@ const StackedAreaLine: React.FC<StackedAreaLineProps> = ({
 
     // Color Scale
     const colorScale = d3.scaleOrdinal().domain(keys).range(d3.schemeTableau10);
+
+    //////////
+    // AXES + AXES TITLES //
+    //////////
+
+    // Group Axes together
+    svg.append("g").attr("class", "stacked-area-axes");
+
+    const xAxis = svg
+      .select(".stacked-area-axes")
+      .append("g")
+      .attr("class", "stacked-area-x-axis")
+      .attr("transform", `translate(0, ${chartHeight})`)
+      .call(d3.axisBottom(xScale).ticks(10));
+
+    svg
+      .select(".stacked-area-axes")
+      .append("g")
+      .attr("class", "stacked-area-y-axis")
+      .call(d3.axisLeft(yScale).ticks(10));
+
+    // Axes Titles
+    svg.append("g").attr("class", "stacked-area-axes-titles");
+
+    // Add X axis label
+    svg
+      .select(".stacked-area-axes-titles")
+      .append("text")
+      .attr("class", "stacked-area-x-axis-title")
+      .attr("text-anchor", "end")
+      .attr("x", chartWidth)
+      .attr("y", chartHeight + margin.bottom)
+      .text("Years")
+      .style("fill", "steelblue");
+
+    // Add Y axis label
+    svg
+      .select(".stacked-area-axes-titles")
+      .append("text")
+      .attr("class", "stacked-area-y-axis-title")
+      .attr("text-anchor", "end")
+      .attr("x", 0)
+      .attr("y", -20)
+      .text("Counts")
+      .attr("text-anchor", "start")
+      .style("fill", "steelblue");
   }, [data, width, height]);
   return (
     <>
