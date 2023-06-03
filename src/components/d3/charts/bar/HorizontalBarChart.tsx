@@ -1,3 +1,6 @@
+// Styling
+import "../../styles.css";
+
 // Dependencies
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
@@ -113,7 +116,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .text(ytitle)
       .attr("fill", "white");
 
-    // Add the bars to the chart
+    // Draw Bars
     svg
       .append("g")
       .attr("class", "bars")
@@ -148,30 +151,31 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .attr("class", "legend");
     var size = 20;
     barLegend
-      .select(".legend")
       .append("g")
       .attr("class", "legend-squares")
       .selectAll("legend-squares")
       .data(normalizedData)
       .enter()
       .append("rect")
-      .attr("x", 75)
-      .attr("y", (_d, i) => 10 + i * (size + 5))
+      .attr("x", size + 25)
+      .attr("y", (_d, i) => margin.top + margin.bottom + i * (size + 5))
       .attr("width", size)
       .attr("height", size)
       .attr("fill", (d) => colorScale(d.label) as string)
       .on("mouseover", highlight)
       .on("mouseleave", noHightlight);
     barLegend
-      .select(".legend")
       .append("g")
       .attr("class", "legend-text")
       .selectAll("legend-text")
       .data(normalizedData)
       .enter()
       .append("text")
-      .attr("x", 100)
-      .attr("y", (_d, i) => 10 + i * (size + 5) + size / 2)
+      .attr("x", size + 50)
+      .attr(
+        "y",
+        (_d, i) => margin.top + margin.bottom + i * (size + 5) + size / 2
+      )
       .text((d: any) => d.label)
       .attr("text-anchor", "left")
       .style("alignment-baseline", "middle")
@@ -187,8 +191,10 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
 
   return (
     <>
-      <svg ref={chartRef} />
-      <svg ref={legendRef} width={200} height={500} />
+      <div id="david">
+        <svg ref={chartRef} />
+        <svg ref={legendRef} width={250} height={height / 2} />
+      </div>
     </>
   );
 };
