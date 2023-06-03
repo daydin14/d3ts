@@ -34,7 +34,7 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .attr("width", width)
       .attr("height", height)
       .append("g")
-      .attr("transform", `translate(${margin.left})`);
+      .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
     // Normalize Data
     const max = d3.max(data, (d) => d.value)!;
@@ -63,14 +63,19 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .rangeRound([chartHeight - margin.bottom, margin.top])
       .padding(0.1);
 
+    const colorScale = d3
+      .scaleOrdinal()
+      .domain(normalizedData.map((d) => d.gender))
+      .range(d3.schemeTableau10);
+
     // Animation transition
     const duration = 1000;
     const t = d3.transition().duration(duration).ease(d3.easeBounceInOut);
 
-    // Add x-axis
+    // Axes
     const xAxis = (g: d3.Selection<SVGGElement, unknown, null, undefined>) =>
       g
-        .attr("transform", `translate(0, ${chartHeight})`)
+        .attr("transform", `translate(${margin.left}, ${chartHeight})`)
         .call((g) =>
           g
             .append("g")
@@ -87,7 +92,10 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
     // Add y-axis
     const yAxis = (g: d3.Selection<SVGGElement, unknown, null, undefined>) =>
       g
-        .attr("transform", `translate(${xScaleMale(0)},0)`)
+        .attr(
+          "transform",
+          `translate(${xScaleMale(0) + margin.left},${margin.top})`
+        )
         .call(d3.axisRight(yScale).tickSizeOuter(0))
         .call((g) => g.selectAll(".tick text").attr("fill", "white"));
 
@@ -103,9 +111,11 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .selectAll("rect")
       .data(normalizedData)
       .join("rect")
-      .attr("fill", (d) => d3.schemeSet1[d.gender === "M" ? 0 : 7])
+      .attr("fill", (d) => colorScale(d.gender) as string)
       .attr("x", (d) =>
-        d.gender === "M" ? xScaleMale(d.value) : xScaleFemale(0)
+        d.gender === "M"
+          ? xScaleMale(d.value) + margin.left
+          : xScaleFemale(0) + margin.right
       )
       .attr("y", (d) => yScale(`${d.age}`)!)
       .attr("width", (d) =>
