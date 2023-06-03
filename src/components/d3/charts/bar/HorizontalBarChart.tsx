@@ -1,3 +1,6 @@
+// Styling
+import "../../styles.css";
+
 // Dependencies
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
@@ -43,6 +46,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .attr("width", width)
       .attr("height", height)
       .append("g")
+      .attr("class", "chart")
       .attr("transform", `translate(${margin.left + 50},${margin.top})`);
 
     // Define the scales
@@ -72,7 +76,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .select(".axes")
       .append("g")
       .attr("class", "x-axis")
-      .attr("transform", `translate(0,${chartHeight})`)
+      .attr("transform", `translate(${margin.left},${chartHeight})`)
       .call(d3.axisBottom(xScale).tickFormat(d3.format(".0%")))
       .transition(t)
       .delay((_d, i) => i * (duration / normalizedData.length))
@@ -83,7 +87,13 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .select(".axes")
       .append("g")
       .attr("class", "y-axis")
-      .call(d3.axisLeft(yScale));
+      .attr("transform", `translate(${margin.left}, 0)`)
+      .call(d3.axisLeft(yScale))
+      .transition(t)
+      .delay((_d, i) => i * (duration / normalizedData.length))
+      .selectAll("text")
+      .attr("transform", "translate(-10,10)rotate(-45)")
+      .style("text-anchor", "end");
 
     // Axes Titles
     svg
@@ -91,22 +101,22 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .append("text")
       .attr("class", "x-title")
       .attr("text-anchor", "end")
-      .attr("x", (width - margin.left) / 2)
-      .attr("y", chartHeight + 50)
+      .attr("x", (chartWidth + margin.left) / 2)
+      .attr("y", chartHeight + margin.top)
       .text(xtitle)
-      .attr("fill", "crimson");
+      .attr("fill", "white");
     svg
       .select(".axes")
       .append("text")
       .attr("class", "y-title")
       .attr("text-anchor", "end")
       .attr("transform", "rotate(-90)")
-      .attr("y", -margin.left - 20)
+      .attr("y", -((margin.left + margin.right) / 2))
       .attr("x", -(chartWidth - margin.bottom) / 2)
       .text(ytitle)
-      .attr("fill", "crimson");
+      .attr("fill", "white");
 
-    // Add the bars to the chart
+    // Draw Bars
     svg
       .append("g")
       .attr("class", "bars")
@@ -115,7 +125,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .enter()
       .append("rect")
       .attr("class", (d: any) => `bar rect-${d.index}`)
-      .attr("x", 0)
+      .attr("x", margin.left)
       .attr("y", (d) => yScale(d.label)!)
       .transition(t)
       .delay((_d, i) => i * (duration / normalizedData.length))
@@ -135,51 +145,51 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       d3.selectAll(".bar").style("opacity", 1);
     };
 
-    const barLegend = d3.select(legendRef.current);
-    barLegend.append("g").attr("class", "legend");
+    const barLegend = d3
+      .select(legendRef.current)
+      .append("g")
+      .attr("class", "legend");
     var size = 20;
     barLegend
-      .select(".legend")
       .append("g")
       .attr("class", "legend-squares")
       .selectAll("legend-squares")
       .data(normalizedData)
       .enter()
       .append("rect")
-      .attr("x", 75)
-      .attr("y", (_d, i) => 10 + i * (size + 5))
+      .attr("x", size + 25)
+      .attr("y", (_d, i) => margin.top + margin.bottom + i * (size + 5))
       .attr("width", size)
       .attr("height", size)
       .attr("fill", (d) => colorScale(d.label) as string)
       .on("mouseover", highlight)
       .on("mouseleave", noHightlight);
     barLegend
-      .select(".legend")
       .append("g")
       .attr("class", "legend-text")
       .selectAll("legend-text")
       .data(normalizedData)
       .enter()
       .append("text")
-      .attr("x", 100)
-      .attr("y", (_d, i) => 10 + i * (size + 5) + size / 2)
+      .attr("x", size + 50)
+      .attr(
+        "y",
+        (_d, i) => margin.top + margin.bottom + i * (size + 5) + size / 2
+      )
       .text((d: any) => d.label)
       .attr("text-anchor", "left")
       .style("alignment-baseline", "middle")
       .attr("fill", (d) => colorScale(d.label) as string)
       .on("mouseover", highlight)
       .on("mouseleave", noHightlight);
-
-    return () => {
-      // Clean up the chart when the component unmounts
-      svg.selectAll("*").remove();
-    };
   }, [data, width, height]);
 
   return (
     <>
-      <svg ref={chartRef} />
-      <svg ref={legendRef} width={200} height={500} />
+      <div id="horizontal-bar-chart">
+        <svg ref={chartRef} />
+        <svg ref={legendRef} width={250} height={height / 2} />
+      </div>
     </>
   );
 };

@@ -20,6 +20,7 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
     const chartWidth = width - (margin.left + margin.right);
     const chartHeight = height - margin.top - margin.bottom;
 
+    // Normalize Data
     const sum = d3.sum(data, (d) => d.value);
     const max = d3.max(data, (d) => d.value)!;
     const min = d3.min(data, (d) => d.value)!;
@@ -35,6 +36,7 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
       .append("g")
+      .attr("class", "chart")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
     // Scales
@@ -43,12 +45,7 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .domain([0, 1])
       .nice()
       .range([0, chartWidth]);
-
-    const yScale = d3
-      .scaleBand()
-      .range([0, chartHeight - 50])
-      .padding(0.1);
-
+    const yScale = d3.scaleBand().range([0, chartHeight]).padding(0.1);
     const colorScale = d3
       .scaleOrdinal()
       .domain(data.map((d) => d.category))
@@ -65,16 +62,16 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
     svg
       .append("g")
       .attr("class", "x-axis")
-      .attr("transform", `translate(5, ${height - margin.top})`)
+      .attr(
+        "transform",
+        `translate(${margin.left}, ${chartHeight + margin.top})`
+      )
       .call(xAxis);
-    //.call((g) => g.select(".domain").remove());     // This removes the x-axis line
-
     svg
       .append("g")
       .attr("class", "y-axis")
-      .attr("transform", `translate(5, ${margin.top + margin.bottom + 30})`)
+      .attr("transform", `translate(${margin.left}, ${margin.top})`)
       .call(yAxis);
-    //.call((g) => g.select(".domain").remove());     // This removes the y-axis line
 
     // Dynamic sizing of each bar in single-stack
     let x: number[] = [0];
@@ -96,8 +93,8 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .join("rect")
       .attr("class", (d: any) => `bar rect-${d.index}`)
       .attr("x", (_, i) => x[i])
-      .attr("transform", `translate(5, ${height / 2})`)
-      .attr("height", height / 5)
+      .attr("transform", `translate(${margin.left}, ${chartHeight / 2})`)
+      .attr("height", chartHeight / 5)
       .transition(t)
       .delay((_d, i) => i * (duration / normalizedData.length))
       .attr("width", (_, i) => w[i])
@@ -113,19 +110,20 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
     const noHightlight = () => {
       d3.selectAll(".bar").style("opacity", 1);
     };
-    var size = 10;
-    const legend = d3.select(legendRef.current);
-    legend.append("g").attr("class", "legend");
+    var size = 20;
+    const legend = d3
+      .select(legendRef.current)
+      .append("g")
+      .attr("class", "legend");
     legend
-      .select(".legend")
       .append("g")
       .attr("class", "legend-squares")
       .selectAll("legend-squares")
       .data(normalizedData)
       .enter()
       .append("rect")
-      .attr("x", 75)
-      .attr("y", (_d, i) => 50 + i * (size + 5))
+      .attr("x", size + 25)
+      .attr("y", (_d, i) => margin.top + margin.bottom + i * (size + 5))
       .attr("width", size)
       .attr("height", size)
       .style("fill", (d: any) => colorScale(d.category) as string)
@@ -133,26 +131,31 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .on("mouseleave", noHightlight);
 
     legend
-      .select(".legend")
       .append("g")
       .attr("class", "legend-text")
       .selectAll("legend-text")
       .data(normalizedData)
       .enter()
       .append("text")
-      .attr("x", 100)
-      .attr("y", (_d, i) => 50 + i * (size + 5) + size / 2)
-      .style("fill", (d: any) => colorScale(d.category) as string)
+      .attr("x", size + 50)
+      .attr(
+        "y",
+        (_d, i) => margin.top + margin.bottom + i * (size + 5) + size / 2
+      )
       .text((d: any) => d.category)
       .attr("text-anchor", "left")
       .style("alignment-baseline", "middle")
+      .style("fill", (d) => colorScale(d.category) as string)
       .on("mouseover", highlight)
       .on("mouseleave", noHightlight);
   }, [data, width, height]);
+
   return (
     <>
-      <svg ref={chartRef} />
-      <svg ref={legendRef} width={200} height={500} />
+      <div id="single-stack-bar-chart">
+        <svg ref={chartRef} />
+        <svg ref={legendRef} width={250} height={height / 2} />
+      </div>
     </>
   );
 };

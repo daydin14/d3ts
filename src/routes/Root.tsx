@@ -45,7 +45,6 @@ const Root = () => {
         ytitle="Coding"
       />
       <br />
-      <br />
       <SingleStack data={singlestackdata} width={800} height={800} />
       <br />
       <br />
