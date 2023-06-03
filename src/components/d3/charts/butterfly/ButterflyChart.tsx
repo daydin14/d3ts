@@ -36,10 +36,20 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .append("g")
       .attr("transform", `translate(${margin.left})`);
 
+    // Normalize Data
+    const max = d3.max(data, (d) => d.value)!;
+    const min = d3.min(data, (d) => d.value)!;
+    const normalizedData = data.map((d, i) => ({
+      ...d,
+      value: (d.value - min) / (max - min),
+      index: i,
+    }));
+    const sum = d3.sum(normalizedData, (d) => d.value)!;
+
     // Define scales
     const xScaleMale = d3
       .scaleLinear()
-      .domain([0, d3.max(data, (d) => d.value)!])
+      .domain([0, 1])
       .rangeRound([chartWidth / 2, margin.left]);
 
     const xScaleFemale = d3
@@ -49,7 +59,7 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
 
     const yScale = d3
       .scaleBand()
-      .domain(data.map((d) => `${d.age}`))
+      .domain(normalizedData.map((d) => `${d.age}`))
       .rangeRound([chartHeight - margin.bottom, margin.top])
       .padding(0.1);
 
@@ -87,7 +97,7 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
     svg
       .append("g")
       .selectAll("rect")
-      .data(data)
+      .data(normalizedData)
       .join("rect")
       .attr("fill", (d) => d3.schemeSet1[d.gender === "M" ? 0 : 7])
       .attr("x", (d) =>
@@ -117,7 +127,7 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .append("g")
       .attr("fill", "blue")
       .selectAll("text")
-      .data(data)
+      .data(normalizedData)
       .join("text")
       .attr("text-anchor", (d) => (d.gender === "M" ? "start" : "end"))
       .attr("x", (d) =>
@@ -133,7 +143,7 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .attr("fill", "white")
       .attr("dy", "0.35em")
       .attr("x", xScaleMale(0) - 24)
-      .attr("y", yScale(`${data[0].age}`)! + yScale.bandwidth() / 2)
+      .attr("y", yScale(`${normalizedData[0].age}`)! + yScale.bandwidth() / 2)
       .text("Male");
 
     svg
@@ -142,7 +152,7 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .attr("fill", "purple")
       .attr("dy", "0.35em")
       .attr("x", xScaleFemale(0) + 24)
-      .attr("y", yScale(`${data[0].age}`)! + yScale.bandwidth() / 2)
+      .attr("y", yScale(`${normalizedData[0].age}`)! + yScale.bandwidth() / 2)
       .text("Female");
 
     svg.append("g").call(xAxis);
@@ -151,7 +161,7 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
     // Add labels
     svg
       .selectAll(".label")
-      .data(data)
+      .data(normalizedData)
       .join((enter) => enter.append("text").attr("class", "label"))
       .text((d) => `${Math.abs(d.value)}%`)
       .attr("x", (d) => xScaleMale(d.value) + (d.value > 0 ? -5 : 5))
