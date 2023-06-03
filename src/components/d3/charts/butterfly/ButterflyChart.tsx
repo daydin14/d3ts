@@ -131,7 +131,10 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .selectAll("rect")
       .data(normalizedData)
       .join("rect")
-      .attr("class", (d: any) => `butterfly-bar rect-${d.index}'`)
+      .attr(
+        "class",
+        (d: any) => `butterfly-bar gen-${d.gender} rect-${d.index}'`
+      )
       .attr("fill", (d) => colorScale(d.gender) as string)
       .attr("x", (d) =>
         d.gender === "M"
@@ -166,7 +169,7 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
         .selectAll(".butterfly-bar")
         .style("opacity", 0.1);
       d3.select(chartRef.current)
-        .select(`.rect-${d.index}`)
+        .selectAll(".butterfly-bar" + `.gen-${d === "M" ? "M" : "F"}`)
         .style("opacity", 1);
     };
     const noHighlight = () => {
