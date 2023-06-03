@@ -16,11 +16,20 @@ const StackedAreaLine: React.FC<StackedAreaLineProps> = ({ width, height }) => {
   useEffect(() => {
     if (!chartRef.current) return;
 
+    //////////
+    // GENERAL //
+    //////////
+
+    // Define the dimensions of the chart
+    const margin = { top: 60, right: 60, bottom: 60, left: 60 };
+    const chartWidth = width - margin.left - margin.right;
+    const chartHeight = height - margin.top - margin.bottom;
+
     // Reference the Chart SVG Element
     const svg = d3
       .select(chartRef.current)
-      .attr("width", width)
-      .attr("height", height);
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom);
   }, [width, height]);
   return (
     <>
