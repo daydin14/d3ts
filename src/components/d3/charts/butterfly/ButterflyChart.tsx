@@ -22,36 +22,51 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
 
   useEffect(() => {
     if (!chartRef.current) return;
-    const margin = { top: 10, right: 0, bottom: 20, left: 0 };
-    const svg = d3.select(chartRef.current);
+
+    // Define the Dimensions of the Chart
+    const margin = { top: 40, right: 40, bottom: 40, left: 40 };
+    const chartWidth = width - (margin.left + margin.right);
+    const chartHeight = height - (margin.top + margin.bottom);
+
+    // Reference the Chart SVG Element
+    const svg = d3
+      .select(chartRef.current)
+      .attr("width", width)
+      .attr("height", height)
+      .append("g")
+      .attr("transform", `translate(${margin.left})`);
 
     // Define scales
     const xScaleMale = d3
       .scaleLinear()
       .domain([0, d3.max(data, (d) => d.value)!])
-      .rangeRound([width / 2, margin.left]);
+      .rangeRound([chartWidth / 2, margin.left]);
 
     const xScaleFemale = d3
       .scaleLinear()
       .domain(xScaleMale.domain())
-      .rangeRound([width / 2, width - margin.right]);
+      .rangeRound([chartWidth / 2, chartWidth - margin.right]);
 
     const yScale = d3
       .scaleBand()
       .domain(data.map((d) => `${d.age}`))
-      .rangeRound([height - margin.bottom, margin.top])
+      .rangeRound([chartHeight - margin.bottom, margin.top])
       .padding(0.1);
 
     // Add x-axis
     const xAxis = (g: d3.Selection<SVGGElement, unknown, null, undefined>) =>
       g
-        .attr("transform", `translate(0, ${height - margin.bottom})`)
+        .attr("transform", `translate(0, ${chartHeight})`)
         .call((g) =>
-          g.append("g").call(d3.axisBottom(xScaleMale).ticks(width / 80, "s"))
-        ) // Affects left side of Y-Axis
+          g
+            .append("g")
+            .call(d3.axisBottom(xScaleMale).ticks(chartWidth / 80, "s"))
+        )
         .call((g) =>
-          g.append("g").call(d3.axisBottom(xScaleFemale).ticks(width / 80, "s"))
-        ) // Affects right side of Y-Axis
+          g
+            .append("g")
+            .call(d3.axisBottom(xScaleFemale).ticks(chartWidth / 80, "s"))
+        )
         .call((g) => g.selectAll(".domain").remove().attr("fill", "white"))
         .call((g) => g.selectAll(".tick:first-of-type").remove());
 
@@ -61,15 +76,6 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
         .attr("transform", `translate(${xScaleMale(0)},0)`)
         .call(d3.axisRight(yScale).tickSizeOuter(0))
         .call((g) => g.selectAll(".tick text").attr("fill", "white"));
-
-    svg
-      .append("g")
-      .attr("width", width)
-      .attr("height", height)
-      .attr("viewBox", [0, 0, width, height])
-      .attr("font-family", "sans-serif")
-      .attr("font-size", 10)
-      .attr("class", "scaleSvg");
 
     const tooltip = svg
       .append("div")
