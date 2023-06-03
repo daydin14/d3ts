@@ -19,22 +19,15 @@ interface Props {
 
 const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
   const chartRef = useRef<SVGSVGElement>(null);
+  const legendRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
-    if (!chartRef.current) return;
+    if (!chartRef.current || !legendRef.current) return;
 
     // Define the Dimensions of the Chart
     const margin = { top: 40, right: 40, bottom: 40, left: 40 };
     const chartWidth = width - (margin.left + margin.right);
     const chartHeight = height - (margin.top + margin.bottom);
-
-    // Reference the Chart SVG Element
-    const svg = d3
-      .select(chartRef.current)
-      .attr("width", width)
-      .attr("height", height)
-      .append("g")
-      .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
     // Normalize Data
     const max = d3.max(data, (d) => d.value)!;
@@ -45,6 +38,14 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       index: i,
     }));
     const sum = d3.sum(normalizedData, (d) => d.value)!;
+
+    // Reference the Chart SVG Element
+    const svg = d3
+      .select(chartRef.current)
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height)
+      .append("g")
+      .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
     // Define scales
     const xScaleMale = d3
@@ -158,8 +159,68 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
     // .on("mouseout", (_d) => {
     //   tooltip.style("opacity", 0);
     // });
+
+    // Legend
+    const highlight = (_event: any, d: any) => {
+      d3.select(chartRef.current)
+        .selectAll(".butterfly-bar")
+        .style("opacity", 0.1);
+      d3.select(chartRef.current)
+        .select(`.rect-${d.index}`)
+        .style("opacity", 1);
+    };
+    const noHighlight = () => {
+      d3.selectAll(".butterfly-bar").style("opacity", 1);
+    };
+    const barLegend = d3
+      .select(legendRef.current)
+      .append("g")
+      .attr("class", "butterfly-legend");
+    const squareSize = 50;
+    const squareTextGap = 50;
+    const legendXOffset = 50;
+    const legendYOffset = 50;
+
+    barLegend
+      .selectAll(".legend-item")
+      .data(["M", "F"])
+      .enter()
+      .append("rect")
+      .attr("class", "legend-item")
+      .attr("x", (_d, i) => legendXOffset + i * (squareSize + squareTextGap))
+      .attr("y", legendYOffset / 5)
+      .attr("width", squareSize)
+      .attr("height", squareSize)
+      .style("fill", (d: any) => colorScale(d) as string)
+      .on("mouseover", highlight)
+      .on("mouseleave", noHighlight);
+
+    barLegend
+      .selectAll(".legend-text")
+      .data(["M", "F"])
+      .enter()
+      .append("text")
+      .attr("class", "legend-text")
+      .attr(
+        "x",
+        (_d, i) => legendXOffset + i * (squareSize + squareTextGap) + 5
+      )
+      .attr("y", legendYOffset * 2 - legendYOffset / 5)
+      .style("fill", (d: any) => colorScale(d) as string)
+      .text((d: any) => (d === "M" ? "Male" : "Female"))
+      .attr("text-anchor", "start")
+      .style("alignment-baseline", "middle")
+      .on("mouseover", highlight)
+      .on("mouseleave", noHighlight);
   }, [data, width, height]);
-  return <svg ref={chartRef} width={width} height={height} />;
+  return (
+    <>
+      <div id="butterfly-chart">
+        <svg ref={legendRef} width={250} height={100} />
+        <svg ref={chartRef} />
+      </div>
+    </>
+  );
 };
 
 export default ButterflyChart;

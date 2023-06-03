@@ -8,7 +8,7 @@
     margin-bottom: 15px;
 }
 
-#butterfly-bar-chart {
+#butterfly-chart {
     display: flex;
     flex-direction: column;
     justify-content: center;
