@@ -72,7 +72,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .select(".axes")
       .append("g")
       .attr("class", "x-axis")
-      .attr("transform", `translate(0,${chartHeight})`)
+      .attr("transform", `translate(${margin.left},${chartHeight})`)
       .call(d3.axisBottom(xScale).tickFormat(d3.format(".0%")))
       .transition(t)
       .delay((_d, i) => i * (duration / normalizedData.length))
@@ -83,6 +83,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .select(".axes")
       .append("g")
       .attr("class", "y-axis")
+      .attr("transform", `translate(${margin.left}, 0)`)
       .call(d3.axisLeft(yScale));
 
     // Axes Titles
@@ -91,20 +92,20 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .append("text")
       .attr("class", "x-title")
       .attr("text-anchor", "end")
-      .attr("x", (width - margin.left) / 2)
-      .attr("y", chartHeight + 50)
+      .attr("x", (chartWidth + margin.left) / 2)
+      .attr("y", chartHeight + margin.top)
       .text(xtitle)
-      .attr("fill", "crimson");
+      .attr("fill", "white");
     svg
       .select(".axes")
       .append("text")
       .attr("class", "y-title")
       .attr("text-anchor", "end")
       .attr("transform", "rotate(-90)")
-      .attr("y", -margin.left - 20)
+      .attr("y", -((margin.left + margin.right) / 2))
       .attr("x", -(chartWidth - margin.bottom) / 2)
       .text(ytitle)
-      .attr("fill", "crimson");
+      .attr("fill", "white");
 
     // Add the bars to the chart
     svg
@@ -115,7 +116,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .enter()
       .append("rect")
       .attr("class", (d: any) => `bar rect-${d.index}`)
-      .attr("x", 0)
+      .attr("x", margin.left)
       .attr("y", (d) => yScale(d.label)!)
       .transition(t)
       .delay((_d, i) => i * (duration / normalizedData.length))
@@ -135,8 +136,10 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       d3.selectAll(".bar").style("opacity", 1);
     };
 
-    const barLegend = d3.select(legendRef.current);
-    barLegend.append("g").attr("class", "legend");
+    const barLegend = d3
+      .select(legendRef.current)
+      .append("g")
+      .attr("class", "legend");
     var size = 20;
     barLegend
       .select(".legend")
