@@ -118,6 +118,25 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .attr("class", "butterfly-y-axis")
       .call(yAxis);
 
+    // Axes Titles
+    svg
+      .select(".butterfly-x-axis")
+      .append("text")
+      .attr("class", "x-title")
+      .attr("text-anchor", "end")
+      .attr("x", chartWidth / 2 + margin.left + 10)
+      .attr("y", margin.top)
+      .text("Percent Total")
+      .attr("fill", "crimson");
+    svg
+      .select(".butterfly-y-axis")
+      .append("text")
+      .attr("class", "y-title")
+      .attr("text-anchor", "end")
+      .attr("y", margin.top / 2)
+      .attr("x", 10)
+      .text("Age")
+      .attr("fill", "crimson");
     // const tooltip = svg
     //   .append("div")
     //   .attr("class", "tooltip")
