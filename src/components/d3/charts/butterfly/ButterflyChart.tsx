@@ -15,13 +15,6 @@ interface Props {
 }
 
 const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
-  // Define a helper function to transform data
-  // Converts PatientCounts to be negative if Gender is Female. This helps direct the female bars to go left instead of right.
-  // const data = originalData.map((d) => ({
-  //     ...d,
-  //     value: d.gender === "F" ? -d.value : d.value,
-  // }));
-
   const margin = { top: 10, right: 0, bottom: 20, left: 0 };
   const svgRef = useRef<SVGSVGElement>(null);
 
