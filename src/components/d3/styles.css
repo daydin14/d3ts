@@ -5,4 +5,13 @@
     justify-content: center;
     align-items: center;
     text-align: center;
+    margin-bottom: 15px;
+}
+
+#butterfly-chart {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
