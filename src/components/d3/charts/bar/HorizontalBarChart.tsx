@@ -43,6 +43,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .attr("width", width)
       .attr("height", height)
       .append("g")
+      .attr("class", "chart")
       .attr("transform", `translate(${margin.left + 50},${margin.top})`);
 
     // Define the scales
@@ -84,7 +85,12 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .append("g")
       .attr("class", "y-axis")
       .attr("transform", `translate(${margin.left}, 0)`)
-      .call(d3.axisLeft(yScale));
+      .call(d3.axisLeft(yScale))
+      .transition(t)
+      .delay((_d, i) => i * (duration / normalizedData.length))
+      .selectAll("text")
+      .attr("transform", "translate(-10,10)rotate(-45)")
+      .style("text-anchor", "end");
 
     // Axes Titles
     svg
