@@ -6,11 +6,24 @@ import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
 interface StackedAreaLineProps {
+  data: {
+    year: number;
+    a: number;
+    b: number;
+    c: number;
+    d: number;
+    e: number;
+    f: number;
+  }[];
   width: number;
   height: number;
 }
 
-const StackedAreaLine: React.FC<StackedAreaLineProps> = ({ width, height }) => {
+const StackedAreaLine: React.FC<StackedAreaLineProps> = ({
+  data,
+  width,
+  height,
+}) => {
   const chartRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
@@ -29,8 +42,29 @@ const StackedAreaLine: React.FC<StackedAreaLineProps> = ({ width, height }) => {
     const svg = d3
       .select(chartRef.current)
       .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom);
-  }, [width, height]);
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("class", "chart")
+      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+    // Reference the Line Plot Group for Chart
+    const lineGroup = svg.append("g").attr("class", "line-group");
+
+    // Generating Keys from Mock Data
+    const keys = Object.keys(data[0]).filter((key) => key !== "year");
+
+    // Stack the data
+    const stackedData = d3
+      .stack()
+      .keys(keys)
+      .value((d: any, key: string) => d[key])(data);
+
+    // Calculate the average counts for each year
+    const avgCounts = data.map((d) => ({
+      year: d.year,
+      avgCount: (d.a + d.b + d.c + d.e + d.f) / 6,
+    }));
+  }, [data, width, height]);
   return (
     <>
       <div id="stacked-area-line-chart">
