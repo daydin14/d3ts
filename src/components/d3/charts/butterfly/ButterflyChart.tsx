@@ -63,6 +63,10 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .rangeRound([chartHeight - margin.bottom, margin.top])
       .padding(0.1);
 
+    // Animation transition
+    const duration = 1000;
+    const t = d3.transition().duration(duration).ease(d3.easeBounceInOut);
+
     // Add x-axis
     const xAxis = (g: d3.Selection<SVGGElement, unknown, null, undefined>) =>
       g
