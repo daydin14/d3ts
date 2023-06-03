@@ -118,6 +118,25 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .attr("class", "butterfly-y-axis")
       .call(yAxis);
 
+    // Axes Titles
+    svg
+      .select(".butterfly-x-axis")
+      .append("text")
+      .attr("class", "x-title")
+      .attr("text-anchor", "end")
+      .attr("x", chartWidth / 2 + margin.left + 10)
+      .attr("y", margin.top)
+      .text("Percent Total")
+      .attr("fill", "crimson");
+    svg
+      .select(".butterfly-y-axis")
+      .append("text")
+      .attr("class", "y-title")
+      .attr("text-anchor", "end")
+      .attr("y", margin.top / 2)
+      .attr("x", 10)
+      .text("Age")
+      .attr("fill", "crimson");
     // const tooltip = svg
     //   .append("div")
     //   .attr("class", "tooltip")
@@ -131,7 +150,10 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .selectAll("rect")
       .data(normalizedData)
       .join("rect")
-      .attr("class", (d: any) => `butterfly-bar rect-${d.index}'`)
+      .attr(
+        "class",
+        (d: any) => `butterfly-bar gen-${d.gender} rect-${d.index}'`
+      )
       .attr("fill", (d) => colorScale(d.gender) as string)
       .attr("x", (d) =>
         d.gender === "M"
@@ -166,7 +188,7 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
         .selectAll(".butterfly-bar")
         .style("opacity", 0.1);
       d3.select(chartRef.current)
-        .select(`.rect-${d.index}`)
+        .selectAll(".butterfly-bar" + `.gen-${d === "M" ? "M" : "F"}`)
         .style("opacity", 1);
     };
     const noHighlight = () => {
