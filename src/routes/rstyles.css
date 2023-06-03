@@ -5,6 +5,11 @@
   align-items: center;
 
   text-align: center;
-  margin-bottom: 50px;
-  width: fit-content;
+  margin: 50px, 50px, 50px, 50px;
+  padding: 100px;
+  max-width: fit-content;
+
+  border-style: solid;
+  border-radius: 20px;
+  border-color: crimson;
 }
