@@ -64,6 +64,38 @@ const StackedAreaLine: React.FC<StackedAreaLineProps> = ({
       year: d.year,
       avgCount: (d.a + d.b + d.c + d.e + d.f) / 6,
     }));
+
+    //////////
+    // STACKED-AREA + LINE PLOT + COLOR SCALES //
+    //////////
+
+    // Stacked Area Scales
+    const xScale = d3
+      .scaleLinear()
+      .domain(d3.extent(data, (d) => d.year) as [number, number])
+      .range([0, chartWidth]);
+
+    const yScale = d3
+      .scaleLinear()
+      .domain([
+        0,
+        d3.max(stackedData, (d) => d3.max(d, (dd) => dd[1])) as number,
+      ])
+      .range([chartHeight, 0]);
+
+    // Line Plot Scales
+    const xScaleLine = d3
+      .scaleLinear()
+      .domain(d3.extent(avgCounts, (d) => d.year) as [number, number])
+      .range([0, chartWidth]);
+
+    const yScaleLine = d3
+      .scaleLinear()
+      .domain([0, d3.max(avgCounts, (d) => d.avgCount) as number])
+      .range([chartHeight, 0]);
+
+    // Color Scale
+    const colorScale = d3.scaleOrdinal().domain(keys).range(d3.schemeTableau10);
   }, [data, width, height]);
   return (
     <>
