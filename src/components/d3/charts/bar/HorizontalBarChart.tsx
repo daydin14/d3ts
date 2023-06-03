@@ -191,7 +191,7 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
 
   return (
     <>
-      <div id="david">
+      <div id="horizontal-bar-chart">
         <svg ref={chartRef} />
         <svg ref={legendRef} width={250} height={height / 2} />
       </div>
