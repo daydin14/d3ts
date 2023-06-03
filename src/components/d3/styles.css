@@ -1,17 +1,32 @@
 #horizontal-bar-chart,
 #single-stack-bar-chart {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    margin-bottom: 15px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+  margin: 50px, 50px, 50px, 50px;
+  padding: 50px;
+  max-width: fit-content;
+
+  border-style: solid;
+  border-radius: 20px;
+  border-color: steelblue;
 }
 
 #butterfly-chart {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+  margin: 50px, 50px, 50px, 50px;
+  padding: 50px;
+  max-width: fit-content;
+
+  border-style: solid;
+  border-radius: 20px;
+  border-color: steelblue;
 }

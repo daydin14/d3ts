@@ -1,8 +1,13 @@
+// Styling
+import "./rstyles.css";
+
+// Components
 import HorizontalBarChart from "../components/d3/charts/bar/HorizontalBarChart";
 import ButterflyChart from "../components/d3/charts/butterfly/ButterflyChart";
 import SingleStack from "../components/d3/charts/single-stack/SingleStack";
 import NavMenu from "../components/nav/NavMenu";
 
+// Mock Data
 const bardata = [
   { label: "HTML", value: 10 },
   { label: "CSS", value: 20 },
@@ -37,20 +42,19 @@ const Root = () => {
   return (
     <>
       <NavMenu />
-      <HorizontalBarChart
-        data={bardata}
-        width={800}
-        height={800}
-        xtitle="Skill Level"
-        ytitle="Coding"
-      />
-      <br />
-      <SingleStack data={singlestackdata} width={800} height={800} />
-      <br />
-      <br />
-      <ButterflyChart data={butterflydata} width={800} height={800} />
-      <br />
-      <br />
+      <div id="charts">
+        <HorizontalBarChart
+          data={bardata}
+          width={800}
+          height={800}
+          xtitle="Skill Level"
+          ytitle="Coding"
+        />
+        <br />
+        <SingleStack data={singlestackdata} width={800} height={800} />
+        <br />
+        <ButterflyChart data={butterflydata} width={800} height={800} />
+      </div>
     </>
   );
 };

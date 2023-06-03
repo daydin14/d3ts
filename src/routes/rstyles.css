@@ -1,0 +1,15 @@
+#charts {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+  margin: 50px, 50px, 50px, 50px;
+  padding: 100px;
+  max-width: fit-content;
+
+  border-style: solid;
+  border-radius: 20px;
+  border-color: crimson;
+}

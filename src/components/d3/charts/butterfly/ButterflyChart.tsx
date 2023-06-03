@@ -127,7 +127,7 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .attr("x", chartWidth / 2 + margin.left + 10)
       .attr("y", margin.top)
       .text("Percent Total")
-      .attr("fill", "crimson");
+      .attr("fill", "white");
     svg
       .select(".butterfly-y-axis")
       .append("text")
@@ -136,7 +136,7 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .attr("y", margin.top / 2)
       .attr("x", 10)
       .text("Age")
-      .attr("fill", "crimson");
+      .attr("fill", "white");
     // const tooltip = svg
     //   .append("div")
     //   .attr("class", "tooltip")
