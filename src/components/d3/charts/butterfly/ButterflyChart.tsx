@@ -73,23 +73,30 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
     const t = d3.transition().duration(duration).ease(d3.easeBounceInOut);
 
     // Axes
+    svg.append("g").attr("class", "butterfly-axes");
+
     const xAxis = (g: d3.Selection<SVGGElement, unknown, null, undefined>) =>
       g
         .attr("transform", `translate(${margin.left}, ${chartHeight})`)
         .call((g) =>
           g
             .append("g")
-            .call(d3.axisBottom(xScaleMale).ticks(chartWidth / 80, "s"))
+            .call(
+              d3
+                .axisBottom(xScaleMale)
+                .ticks(chartWidth / 80, `${d3.format(".0%")}`)
+            )
         )
         .call((g) =>
           g
             .append("g")
-            .call(d3.axisBottom(xScaleFemale).ticks(chartWidth / 80, "s"))
+            .call(
+              d3
+                .axisBottom(xScaleFemale)
+                .ticks(chartWidth / 80, `${d3.format(".0%")}`)
+            )
         )
-        .call((g) => g.selectAll(".domain").remove().attr("fill", "white"))
         .call((g) => g.selectAll(".tick:first-of-type").remove());
-
-    // Add y-axis
     const yAxis = (g: d3.Selection<SVGGElement, unknown, null, undefined>) =>
       g
         .attr(
@@ -99,92 +106,58 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
         .call(d3.axisRight(yScale).tickSizeOuter(0))
         .call((g) => g.selectAll(".tick text").attr("fill", "white"));
 
-    const tooltip = svg
-      .append("div")
-      .attr("class", "tooltip")
-      .attr("id", "tooltip")
-      .style("opacity", 0);
+    svg
+      .select(".butterfly-axes")
+      .append("g")
+      .attr("class", "butterfly-x-axis")
+      .call(xAxis);
+    svg
+      .select(".butterfly-axes")
+      .append("g")
+      .attr("class", "butterfly-y-axis")
+      .call(yAxis);
+
+    // const tooltip = svg
+    //   .append("div")
+    //   .attr("class", "tooltip")
+    //   .attr("id", "tooltip")
+    //   .style("opacity", 0);
 
     // Draw bars
     svg
       .append("g")
+      .attr("class", "bars")
       .selectAll("rect")
       .data(normalizedData)
       .join("rect")
+      .attr("class", (d: any) => `butterfly-bar rect-${d.index}'`)
       .attr("fill", (d) => colorScale(d.gender) as string)
       .attr("x", (d) =>
         d.gender === "M"
-          ? xScaleMale(d.value) + margin.left
+          ? xScaleMale(d.value / sum) + margin.left
           : xScaleFemale(0) + margin.right
       )
-      .attr("y", (d) => yScale(`${d.age}`)!)
+      .attr("y", (d) => yScale(`${d.age}`)! + margin.top)
+      .transition(t)
+      .delay((_d, i) => i * (duration / normalizedData.length))
       .attr("width", (d) =>
         d.gender === "M"
-          ? xScaleMale(0) - xScaleFemale(-d.value)
-          : xScaleFemale(d.value) - xScaleFemale(0)
+          ? xScaleMale(0) - xScaleMale(d.value / sum)
+          : xScaleFemale(d.value / sum) - xScaleFemale(0)
       )
-      .attr("height", yScale.bandwidth())
-      .on("mouseover", (d) => {
-        tooltip.style("opacity", 0.9);
-        tooltip
-          .html(() => {
-            return `Gender: ${d.gender}, Age: ${d.age}: Patient Counts: ${d.value}%`;
-          })
-          .style("left", `${(event as MouseEvent).pageX + 10}px`)
-          .style("top", `${(event as MouseEvent).pageY - 28}px`);
-      })
-      .on("mouseout", (_d) => {
-        tooltip.style("opacity", 0);
-      });
-
-    svg
-      .append("g")
-      .attr("fill", "blue")
-      .selectAll("text")
-      .data(normalizedData)
-      .join("text")
-      .attr("text-anchor", (d) => (d.gender === "M" ? "start" : "end"))
-      .attr("x", (d) =>
-        d.gender === "M" ? xScaleMale(d.value) + 4 : xScaleFemale(d.value) - 4
-      )
-      .attr("y", (d) => yScale(`${d.age}`)! + yScale.bandwidth() / 2)
-      .attr("dy", "0.35em")
-      .text((d) => `${d.value}%`);
-
-    svg
-      .append("text")
-      .attr("text-anchor", "end")
-      .attr("fill", "white")
-      .attr("dy", "0.35em")
-      .attr("x", xScaleMale(0) - 24)
-      .attr("y", yScale(`${normalizedData[0].age}`)! + yScale.bandwidth() / 2)
-      .text("Male");
-
-    svg
-      .append("text")
-      .attr("text-anchor", "start")
-      .attr("fill", "purple")
-      .attr("dy", "0.35em")
-      .attr("x", xScaleFemale(0) + 24)
-      .attr("y", yScale(`${normalizedData[0].age}`)! + yScale.bandwidth() / 2)
-      .text("Female");
-
-    svg.append("g").call(xAxis);
-    svg.append("g").call(yAxis);
-
-    // Add labels
-    svg
-      .selectAll(".label")
-      .data(normalizedData)
-      .join((enter) => enter.append("text").attr("class", "label"))
-      .text((d) => `${Math.abs(d.value)}%`)
-      .attr("x", (d) => xScaleMale(d.value) + (d.value > 0 ? -5 : 5))
-      .attr(
-        "y",
-        (d) => yScale(`${d.age} ${d.gender}`)! + yScale.bandwidth() / 2
-      )
-      .attr("text-anchor", (d) => (d.value > 0 ? "end" : "start"))
-      .attr("alignment-baseline");
+      .attr("height", yScale.bandwidth() / 2);
+    // .on("mouseover", (d) => {
+    //   tooltip.style("opacity", 0.9);
+    //   tooltip
+    //     .html(() => {
+    //       return `Gender: ${d.gender}, Age: ${d.age}: Patient Counts: ${d.value}%`;
+    //     })
+    //     .style("left", `${(event as MouseEvent).pageX + 10}px`)
+    //     .style("top", `${(event as MouseEvent).pageY - 28}px`);
+    // })
+    // .on("mouseout", (_d) => {
+    //   tooltip.style("opacity", 0);
+    // });
   }, [data, width, height]);
   return <svg ref={chartRef} width={width} height={height} />;
 };
