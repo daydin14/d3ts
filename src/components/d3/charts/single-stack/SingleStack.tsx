@@ -149,6 +149,7 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
       .on("mouseover", highlight)
       .on("mouseleave", noHightlight);
   }, [data, width, height]);
+
   return (
     <>
       <div id="single-stack-bar-chart">

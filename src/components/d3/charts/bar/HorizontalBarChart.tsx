@@ -182,11 +182,6 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
       .attr("fill", (d) => colorScale(d.label) as string)
       .on("mouseover", highlight)
       .on("mouseleave", noHightlight);
-
-    return () => {
-      // Clean up the chart when the component unmounts
-      svg.selectAll("*").remove();
-    };
   }, [data, width, height]);
 
   return (
