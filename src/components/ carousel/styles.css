@@ -1,0 +1,23 @@
+#carousel {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+  margin: 50px, 50px, 50px, 50px;
+  padding: 100px;
+  max-width: fit-content;
+
+  border-style: solid;
+  border-radius: 20px;
+  border-color: crimson;
+}
+
+#carousel button {
+  height: 900px;
+  border-radius: 20px;
+  padding: 50px;
+  text-align: center;
+  font-size: 36px;
+}
