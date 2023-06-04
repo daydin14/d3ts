@@ -55,6 +55,16 @@ const SingleStack: React.FC<SingleStackProps> = ({ data, width, height }) => {
     const duration = 500;
     const t = d3.transition().duration(duration).ease(d3.easeLinear);
 
+    // Chart Title
+    svg
+      .append("text")
+      .attr("class", "chart-title")
+      .attr("text-anchor", "middle")
+      .attr("x", (chartWidth + margin.left) / 2)
+      .attr("y", -margin.top / 2)
+      .text("Single-Stack Bar Chart Title")
+      .attr("fill", "white");
+
     // Axes
     const xAxis = d3.axisBottom(xScale).ticks(10, `${d3.format(".0%")}`);
     const yAxis = d3.axisLeft(yScale);

@@ -69,6 +69,16 @@ const HorizontalBarChart: React.FC<HorizontalBarChartProps> = ({
     const duration = 500;
     const t = d3.transition().duration(duration).ease(d3.easeLinear);
 
+    // Chart Title
+    svg
+      .append("text")
+      .attr("class", "chart-title")
+      .attr("text-anchor", "middle")
+      .attr("x", (chartWidth + margin.left) / 2)
+      .attr("y", -margin.top / 2)
+      .text("Horizontal Bar Chart Title")
+      .attr("fill", "white");
+
     // Axes
     svg.append("g").attr("class", "axes");
 

@@ -99,8 +99,18 @@ const StackedAreaLine: React.FC<StackedAreaLineProps> = ({
     const colorScale = d3.scaleOrdinal().domain(keys).range(d3.schemeTableau10);
 
     //////////
-    // AXES + AXES TITLES //
+    // TITLE + AXES + AXES TITLES //
     //////////
+
+    // Chart Title
+    svg
+      .append("text")
+      .attr("class", "chart-title")
+      .attr("text-anchor", "middle")
+      .attr("x", (chartWidth + margin.left) / 2)
+      .attr("y", -margin.top / 2)
+      .text("Stacked-Area Line Plot Chart Title")
+      .attr("fill", "white");
 
     // Group Axes together
     svg.append("g").attr("class", "stacked-area-axes");

@@ -74,6 +74,16 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
     const duration = 1000;
     const t = d3.transition().duration(duration).ease(d3.easeBounceInOut);
 
+    // Chart Title
+    svg
+      .append("text")
+      .attr("class", "chart-title")
+      .attr("text-anchor", "middle")
+      .attr("x", (chartWidth + margin.left) / 2)
+      .attr("y", -margin.top / 2)
+      .text("Butterfly Bar Chart Population Plot Title")
+      .attr("fill", "white");
+
     // Axes
     svg.append("g").attr("class", "butterfly-axes");
 
