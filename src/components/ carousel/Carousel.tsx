@@ -8,6 +8,7 @@ import React, { useState } from "react";
 import HorizontalBarChart from "../d3/charts/bar/HorizontalBarChart";
 import ButterflyChart from "../d3/charts/butterfly/ButterflyChart";
 import SingleStack from "../d3/charts/single-stack/SingleStack";
+import StackedAreaLine from "../d3/charts/stacked-area-line/StackedAreaLine";
 
 // Mock Data
 const bardata = [
@@ -40,15 +41,29 @@ const butterflydata = [
   { age: 45, gender: "F", value: 42 },
 ];
 
+function generateRandomData(): any {
+  return {
+    year: Math.random() * (2023 - 1997) + 1997,
+    a: Math.round(Math.random() * 1000000),
+    b: Math.round(Math.random() * 1000000),
+    c: Math.round(Math.random() * 1000000),
+    d: Math.round(Math.random() * 1000000),
+    e: Math.round(Math.random() * 1000000),
+    f: Math.round(Math.random() * 1000000),
+  };
+}
+
+const stackedarealinedata = Array.from({ length: 50 }, generateRandomData);
+
 const Carousel: React.FC = () => {
   const [currentChart, setCurrentChart] = useState(0);
 
   const handlePrevious = () => {
-    setCurrentChart((prevChart) => (prevChart === 0 ? 2 : prevChart - 1));
+    setCurrentChart((prevChart) => (prevChart === 0 ? 3 : prevChart - 1));
   };
 
   const handleNext = () => {
-    setCurrentChart((prevChart) => (prevChart === 2 ? 0 : prevChart + 1));
+    setCurrentChart((prevChart) => (prevChart === 3 ? 0 : prevChart + 1));
   };
 
   const renderChart = () => {
@@ -75,6 +90,16 @@ const Carousel: React.FC = () => {
         return (
           <>
             <ButterflyChart data={butterflydata} width={800} height={800} />
+          </>
+        );
+      case 3:
+        return (
+          <>
+            <StackedAreaLine
+              data={stackedarealinedata}
+              width={800}
+              height={800}
+            />
           </>
         );
       default:
