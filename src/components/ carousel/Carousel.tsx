@@ -109,6 +109,7 @@ const Carousel: React.FC = () => {
 
   return (
     <>
+      <h1>A Carousel of D3 Charts</h1>
       <div id="carousel">
         <button onClick={handlePrevious}>Previous</button>
         {renderChart()}
