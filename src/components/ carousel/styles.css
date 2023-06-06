@@ -5,9 +5,6 @@
   align-items: center;
 
   text-align: center;
-  margin: 50px, 50px, 50px, 50px;
-  padding: 100px;
-  max-width: fit-content;
 
   border-style: solid;
   border-radius: 20px;
@@ -15,9 +12,17 @@
 }
 
 #carousel button {
-  height: 900px;
-  border-radius: 20px;
-  padding: 50px;
+  /* height: 900px;
+  padding: 50px; */
+
   text-align: center;
   font-size: 36px;
+
+  border-style: solid;
+  border-radius: 20px;
+  border-color: yellow;
+}
+
+h1 {
+  text-align: center;
 }

@@ -19,10 +19,10 @@ interface Props {
 
 const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
   const chartRef = useRef<SVGSVGElement>(null);
-  const legendRef = useRef<SVGSVGElement | null>(null);
+  // const legendRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
-    if (!chartRef.current || !legendRef.current) return;
+    if (!chartRef.current) return;
 
     // Define the Dimensions of the Chart
     const margin = { top: 40, right: 40, bottom: 40, left: 40 };
@@ -45,6 +45,7 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .attr("width", width + margin.left + margin.right)
       .attr("height", height)
       .append("g")
+      .attr("class", "chart")
       .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
     // Define scales
@@ -72,6 +73,16 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
     // Animation transition
     const duration = 1000;
     const t = d3.transition().duration(duration).ease(d3.easeBounceInOut);
+
+    // Chart Title
+    svg
+      .append("text")
+      .attr("class", "chart-title")
+      .attr("text-anchor", "middle")
+      .attr("x", (chartWidth + margin.left) / 2)
+      .attr("y", -margin.top / 2)
+      .text("Butterfly Bar Chart Population Plot Title")
+      .attr("fill", "white");
 
     // Axes
     svg.append("g").attr("class", "butterfly-axes");
@@ -137,10 +148,11 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .attr("x", 10)
       .text("Age")
       .attr("fill", "white");
-    // const tooltip = svg
+
+    // const tooltip = d3
+    //   .select(".butterfly-bar")
     //   .append("div")
     //   .attr("class", "tooltip")
-    //   .attr("id", "tooltip")
     //   .style("opacity", 0);
 
     // Draw bars
@@ -152,7 +164,7 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .join("rect")
       .attr(
         "class",
-        (d: any) => `butterfly-bar gen-${d.gender} rect-${d.index}'`
+        (d: any) => `butterfly-bar gen-${d.gender} rect-${d.index}`
       )
       .attr("fill", (d) => colorScale(d.gender) as string)
       .attr("x", (d) =>
@@ -169,16 +181,17 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
           : xScaleFemale(d.value / sum) - xScaleFemale(0)
       )
       .attr("height", yScale.bandwidth() / 2);
-    // .on("mouseover", (d) => {
+    // .on("mouseover", (event: any, d: any) => {
+    //   const { pageX, pageY } = event;
     //   tooltip.style("opacity", 0.9);
     //   tooltip
     //     .html(() => {
-    //       return `Gender: ${d.gender}, Age: ${d.age}: Patient Counts: ${d.value}%`;
+    //       return `Gender: ${d.gender}, Age: ${d.age}, Patient Counts: ${d.value}%`;
     //     })
-    //     .style("left", `${(event as MouseEvent).pageX + 10}px`)
-    //     .style("top", `${(event as MouseEvent).pageY - 28}px`);
+    //     .style("left", `${pageX + 10}px`)
+    //     .style("top", `${pageY - 28}px`);
     // })
-    // .on("mouseout", (_d) => {
+    // .on("mouseout", () => {
     //   tooltip.style("opacity", 0);
     // });
 
@@ -195,7 +208,10 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       d3.selectAll(".butterfly-bar").style("opacity", 1);
     };
     const barLegend = d3
-      .select(legendRef.current)
+      .select("#butterfly-chart")
+      .append("svg")
+      .attr("width", 250)
+      .attr("height", 100)
       .append("g")
       .attr("class", "butterfly-legend");
     const squareSize = 50;
@@ -238,7 +254,7 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
   return (
     <>
       <div id="butterfly-chart">
-        <svg ref={legendRef} width={250} height={100} />
+        {/* <svg ref={legendRef} width={250} height={100} /> */}
         <svg ref={chartRef} />
       </div>
     </>
