@@ -149,11 +149,11 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
       .text("Age")
       .attr("fill", "white");
 
-    const tooltip = d3
-      .select(".butterfly-bar")
-      .append("div")
-      .attr("class", "tooltip")
-      .style("opacity", 0);
+    // const tooltip = d3
+    //   .select(".butterfly-bar")
+    //   .append("div")
+    //   .attr("class", "tooltip")
+    //   .style("opacity", 0);
 
     // Draw bars
     svg
@@ -180,20 +180,20 @@ const ButterflyChart: React.FC<Props> = ({ data, width, height }) => {
           ? xScaleMale(0) - xScaleMale(d.value / sum)
           : xScaleFemale(d.value / sum) - xScaleFemale(0)
       )
-      .attr("height", yScale.bandwidth() / 2)
-      .on("mouseover", (event: any, d: any) => {
-        const { pageX, pageY } = event;
-        tooltip.style("opacity", 0.9);
-        tooltip
-          .html(() => {
-            return `Gender: ${d.gender}, Age: ${d.age}, Patient Counts: ${d.value}%`;
-          })
-          .style("left", `${pageX + 10}px`)
-          .style("top", `${pageY - 28}px`);
-      })
-      .on("mouseout", () => {
-        tooltip.style("opacity", 0);
-      });
+      .attr("height", yScale.bandwidth() / 2);
+    // .on("mouseover", (event: any, d: any) => {
+    //   const { pageX, pageY } = event;
+    //   tooltip.style("opacity", 0.9);
+    //   tooltip
+    //     .html(() => {
+    //       return `Gender: ${d.gender}, Age: ${d.age}, Patient Counts: ${d.value}%`;
+    //     })
+    //     .style("left", `${pageX + 10}px`)
+    //     .style("top", `${pageY - 28}px`);
+    // })
+    // .on("mouseout", () => {
+    //   tooltip.style("opacity", 0);
+    // });
 
     // Legend
     const highlight = (_event: any, d: any) => {
