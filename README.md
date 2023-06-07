@@ -16,14 +16,12 @@
 
 ## Table of Contents
 
-#### Features:
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
 
-    - Installation
-    - Usage
-    - Contributing
-    - License
-
-## **Installation**
+## **Getting Started**
 
 To run this project locally, follow these steps:
 
