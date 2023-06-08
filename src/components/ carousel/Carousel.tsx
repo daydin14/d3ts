@@ -7,6 +7,7 @@ import React, { useState } from "react";
 // Components
 import HorizontalBarChart from "../d3/charts/bar/HorizontalBarChart";
 import ButterflyChart from "../d3/charts/butterfly/ButterflyChart";
+import Map from '../d3/charts/map/WorldMap';
 import SingleStack from "../d3/charts/single-stack/SingleStack";
 import StackedAreaLine from "../d3/charts/stacked-area-line/StackedAreaLine";
 
@@ -59,11 +60,11 @@ const Carousel: React.FC = () => {
   const [currentChart, setCurrentChart] = useState(0);
 
   const handlePrevious = () => {
-    setCurrentChart((prevChart) => (prevChart === 0 ? 3 : prevChart - 1));
+    setCurrentChart((prevChart) => (prevChart === 0 ? 4 : prevChart - 1));
   };
 
   const handleNext = () => {
-    setCurrentChart((prevChart) => (prevChart === 3 ? 0 : prevChart + 1));
+    setCurrentChart((prevChart) => (prevChart === 4 ? 0 : prevChart + 1));
   };
 
   const renderChart = () => {
@@ -102,6 +103,12 @@ const Carousel: React.FC = () => {
             />
           </>
         );
+      case 4:
+        return (
+          <>
+            <Map width={800} height={500} />
+          </>
+        )
       default:
         return null;
     }
