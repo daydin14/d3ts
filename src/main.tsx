@@ -3,8 +3,11 @@ import "./index.css";
 
 // Dependencies
 import React from "react";
-import ReactDOM from "react-dom/client";
+import ReactDOM from "react-dom";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+// Types
+const createRoot = (ReactDOM as any).createRoot;
 
 // Pages
 import ErrorPage from "./pages/ErrorPage.tsx";
@@ -19,8 +22,13 @@ const router = createBrowserRouter([
     element: <Root />,
     errorElement: <ErrorPage />,
   },
+  {
+    path: "/app",
+    element: <App />,
+    errorElement: <ErrorPage />,
+  },
 ]);
 
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+createRoot(document.getElementById("root") as HTMLElement).render(
   <RouterProvider router={router} />
 );
