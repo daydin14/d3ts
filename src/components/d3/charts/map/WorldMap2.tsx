@@ -12,60 +12,56 @@ const WorldMap2: React.FC<WorldMapProps> = ({ width, height, usTerritory }) => {
     const svgRef = useRef<SVGSVGElement | null>(null);
 
     useEffect(() => {
-        const chartWidth = width; // Adjust the width of the map as needed
-        const chartHeight = height; // Adjust the height of the map as needed
+        if (!svgRef.current) return;
+
+        // Define the dimensions of the chart
+        const margin = { top: 50, right: 50, bottom: 50, left: 50 };
+        const chartWidth = width - margin.left - margin.right; // Adjust the width of the map as needed
+        const chartHeight = height - margin.top - margin.bottom; // Adjust the height of the map as needed
 
         // Load the JSON data
         const states = feature(usTerritory, usTerritory.objects.states);
-        const territories = feature(usTerritory, usTerritory.objects.territories);
+        const nation = feature(usTerritory, usTerritory.objects.nation);
+        // Generate the path
+        const path = geoPath();
 
-        // Create a projection for the map
-        const statesProjection = geoAlbersUsa().fitExtent(
-            [
-                [0, 0],
-                [chartWidth, chartHeight],
-            ],
-            states
-        );
-        const territoriesProjection = geoAlbersUsa().fitExtent(
-            [
-                [0, 0],
-                [chartWidth, chartHeight],
-            ],
-            territories
-        );
 
-        // Create a path for each projection
-        const statesPath = geoPath().projection(statesProjection);
-        const territoriesPath = geoPath().projection(territoriesProjection);
-
-        select(svgRef.current)
+        // Reference the chart SVG Element
+        const svg =
+            select(svgRef.current)
+                .attr("width", chartWidth)
+                .attr("height", chartHeight)
+                .append("g")
+                .attr("class", "chart")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+        // States
+        svg
             .append("g")
             .attr("class", "states")
             .selectAll("path")
             .data((states as any).features)
             .enter()
             .append("path")
-            .attr("d", statesPath as any)
+            .attr("d", (path as any))
             .attr("fill", "steelblue")
             .attr("stroke", "white");
-
-        select(svgRef.current)
+        // Nation
+        svg
             .append("g")
-            .attr("class", "territories")
+            .attr("class", "nation")
             .selectAll("path")
-            .data((territories as any).features)
+            .data((nation as any).features)
             .enter()
             .append("path")
-            .attr("d", territoriesPath as any)
-            .attr("fill", "steelblue")
-            .attr("stroke", "white");
+            .attr("d", path as any)
+            .attr("fill", "white")
+            .attr("stroke", "black");
 
     }, [width, height, usTerritory]);
 
     return (
         <>
-            <svg ref={svgRef} />
+            <svg ref={svgRef} width={width} height={height} />
         </>
     );
 };
