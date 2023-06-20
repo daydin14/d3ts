@@ -113,13 +113,13 @@ const Carousel: React.FC = () => {
       case 4:
         return (
           <>
-            <Map width={800} height={500} />
+            <Map width={800} height={800} />
           </>
         );
       case 5:
         return (
           <>
-            <Map2 width={800} height={500} usTerritory={usTerritory} />
+            <Map2 width={1920} height={1080} usTerritory={usTerritory} />
           </>
         );
       default:
