@@ -7,9 +7,16 @@ import React, { useState } from "react";
 // Components
 import HorizontalBarChart from "../d3/charts/bar/HorizontalBarChart";
 import ButterflyChart from "../d3/charts/butterfly/ButterflyChart";
-import Map from '../d3/charts/map/WorldMap';
+import Map from "../d3/charts/map/WorldMap";
 import SingleStack from "../d3/charts/single-stack/SingleStack";
 import StackedAreaLine from "../d3/charts/stacked-area-line/StackedAreaLine";
+
+
+
+import usTerritory from "../d3/charts/map/us-states.json"
+import Map2 from "../d3/charts/map/WorldMap2";
+
+
 
 // Mock Data
 const bardata = [
@@ -60,11 +67,11 @@ const Carousel: React.FC = () => {
   const [currentChart, setCurrentChart] = useState(0);
 
   const handlePrevious = () => {
-    setCurrentChart((prevChart) => (prevChart === 0 ? 4 : prevChart - 1));
+    setCurrentChart((prevChart) => (prevChart === 0 ? 5 : prevChart - 1));
   };
 
   const handleNext = () => {
-    setCurrentChart((prevChart) => (prevChart === 4 ? 0 : prevChart + 1));
+    setCurrentChart((prevChart) => (prevChart === 5 ? 0 : prevChart + 1));
   };
 
   const renderChart = () => {
@@ -106,9 +113,15 @@ const Carousel: React.FC = () => {
       case 4:
         return (
           <>
-            <Map width={800} height={500} />
+            <Map width={800} height={800} />
           </>
-        )
+        );
+      case 5:
+        return (
+          <>
+            <Map2 width={1920} height={1080} usTerritory={usTerritory} />
+          </>
+        );
       default:
         return null;
     }
