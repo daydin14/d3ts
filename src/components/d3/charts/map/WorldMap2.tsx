@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { feature, mesh } from "topojson-client";
-import { select, geoAlbersUsa, geoPath } from "d3";
+import { feature } from "topojson-client";
+import { select, geoPath } from "d3";
 
 interface WorldMapProps {
     width: number;
@@ -15,7 +15,7 @@ const WorldMap2: React.FC<WorldMapProps> = ({ width, height, usTerritory }) => {
         if (!svgRef.current) return;
 
         // Define the dimensions of the chart
-        const margin = { top: 10, right: 10, bottom: 10, left: 10 };
+        const margin = { top: 0, right: 0, bottom: 0, left: 0 };
         const chartWidth = width - margin.left - margin.right;
         const chartHeight = height - margin.top - margin.bottom;
 
@@ -33,7 +33,7 @@ const WorldMap2: React.FC<WorldMapProps> = ({ width, height, usTerritory }) => {
                 .attr("height", chartHeight)
                 .append("g")
                 .attr("class", "chart")
-                .attr("transform", `translate(${margin.left},${margin.top})`);
+        //.attr("transform", `translate(${margin.left},${margin.top})`);
         // Nation
         svg
             .append("g")

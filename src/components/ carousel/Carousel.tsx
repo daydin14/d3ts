@@ -13,7 +13,9 @@ import StackedAreaLine from "../d3/charts/stacked-area-line/StackedAreaLine";
 
 
 
-import usTerritory from "../d3/charts/map/us-states.json"
+// import usTerritory from "../d3/charts/map/us-states.json"
+//import usTerritory from "../../assets/json/states-albers-10m.json"
+import usTerritory from "../../assets/json/dummy.json"
 import Map2 from "../d3/charts/map/WorldMap2";
 
 
